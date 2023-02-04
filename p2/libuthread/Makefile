@@ -1,6 +1,21 @@
 # Target library
-lib := libuthread.a
+# lib := libuthread.a
 
-all: $(lib)
+# all: $(lib) queue project2
 
-## TODO: Phase 1
+all: queue
+
+# project2: $(lib)
+# 	gcc -o $@ $< -lm
+
+# $(lib): queue.o
+# 	ar rcs $@ $^
+
+queue: queue.c queue.h
+	gcc -Wall -Werror -Wextra -o $@ $<
+	
+# queue.o: queue.c queue.h
+# 	gcc -Wall -Werror -Wextra -o $@ $<
+
+clean: 
+	rm -f queue
