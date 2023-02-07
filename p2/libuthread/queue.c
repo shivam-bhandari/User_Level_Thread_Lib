@@ -19,6 +19,8 @@ struct Node {
 	struct Node* prev;
 };
 
+
+
 // The LL to store the queue
 // Using rear pointer to insert at the end 
 struct queue {
@@ -28,9 +30,40 @@ struct queue {
 	int len;
 };
 
+int queueEmpty(queue_t queue){
+	return queue->len == 0;
+}
+
+// int queue_pop(queue_t queue)
+// {
+// 	if (queueEmpty(queue)
+// 		|| queue == NULL) return -1;
+
+// 	struct Node *temp_rm;
+// 	temp_rm = queue->front;
+// 	queue->front = queue->front->next;
+	
+// 	if (queue->front) 
+// 		queue->front->prev = NULL;
+// 	// otherwise empty
+// 	else queue->rear = NULL;
+
+// 	queue->len--;
+// 	free(temp_rm);
+	
+// 	return 0;
+// }
+
+// void *queue_front(queue_t queue)
+// {
+// 	if (queueEmpty(queue)
+// 		|| queue == NULL) return NULL;
+// 	else return queue->front->data;
+// }
+
 void print_queue(queue_t queue){
-	// if(!queue)
-	// 	break;
+	if(!queue)
+		return;
 	
 	struct Node* temp;
 	int i = 1;
@@ -41,21 +74,8 @@ void print_queue(queue_t queue){
 		temp = temp->next;
 		i++;
 	}
-	i--;
-	temp = queue->rear;
 
-	while(temp!=NULL)
-	{
-		printf("Element %d is %p \n",i, temp->data);
-		temp = temp->prev;
-		i--;
-	}
 }
-
-int queueEmpty(queue_t queue){
-	return queue->len == 0;
-}
-
 queue_t queue_create(void)
 {
 	/* TODO Phase 1 */
@@ -63,23 +83,19 @@ queue_t queue_create(void)
     q->front = NULL;
 	q->rear = NULL;
 	q->len = 0;
-	printf("queue created\n\n");
+	// printf("queue created\n\n");
     return q;
 }
 
 // int queue_destroy(queue_t queue)
 // {
 // 	/* TODO Phase 1 */
-// 	if (queueEmpty(queue) || !queue){
-// 		return -1;
-// 	}
-
-// 	int* tmp_data = 0;
-// 	while(!queueEmpty(queue)) {
-// 		free(queue->front); // IMPLEMENT FUNCTION
-// 		queue_dequeue(queue, (void *)tmp_data);
-// 	}
-// 	return 0;
+// 	// if (queue == NULL) return -1;
+// 	// while(!queueEmpty(queue)) {
+// 	// 	free(queue_front(queue));
+// 	// 	queue_pop(queue);
+// 	// }
+// 	// return 0;
 // }
 
 int queue_enqueue(queue_t queue, void *data)
@@ -127,7 +143,7 @@ int queue_enqueue(queue_t queue, void *data)
 		queue->rear->next = NULL;
 	} 
 
-	printf("enqueue done\n\n");
+	// printf("enqueue done\n\n");
 	// printf("front: %p\n", queue->front->data);
 	
 	queue->len++;
@@ -142,12 +158,12 @@ int queue_dequeue(queue_t queue, void **data)
 	//printf("in queue dequeue\n");
 	if(queueEmpty(queue) || !queue || data == NULL) 
 	{
-		printf("queue or data NULL; return -1\n");
+		// printf("queue or data NULL; return -1\n");
 		return -1;
 	}
 	if(queue->front == NULL) {
 
-		printf("aaa\n");
+		// printf("aaa\n");
 	}
 
 	//printf("data at the front of queue is: %p\n", queue->front->data);
@@ -172,10 +188,10 @@ int queue_dequeue(queue_t queue, void **data)
 	
 	free(temp);
 	
-	print_queue(queue);
+	// print_queue(queue);
 
 	//printf("new queue len : %d\n", queue->len);
-	printf("deque done\n\n");
+	// printf("deque done\n\n");
 	return 0;
 	/* TODO Phase 1 */
 }
@@ -198,7 +214,7 @@ int queue_delete(queue_t queue, void *data)
 		queue->front = NULL;
 		queue->len--;
 		free(temp);
-		printf("deleted last element in queue\n");
+		// printf("deleted last element in queue\n");
 		// print_queue(queue);
 		return 0;
 	}
@@ -226,7 +242,7 @@ int queue_delete(queue_t queue, void *data)
 				P->next = N;
 			}
 			free(temp);
-			printf("delete completed\n\n");
+			// printf("delete completed\n\n");
 			break;
 		}
 		temp = temp->next;
@@ -286,19 +302,23 @@ int main()
 {
 	//printf("doing queue_create:\n");
 	struct queue* q = queue_create();
-	int no = 1;
-	int *temp = &no;
-	no = 30;
+
 	queue_enqueue(q, (void*)30);
 	queue_enqueue(q, (void*)40);
 	queue_enqueue(q, (void*)50);
-
+	// int* e;
 	queue_delete(q,(void*)40);
-	queue_delete(q,(void*)50);
-	queue_delete(q,(void*)30);
+	// print_queue(q);
+	// queue_destroy(q);
+	// queue_dequeue(q,(void**)&e);
+	// queue_dequeue(q,(void**)&e);
+	// queue_dequeue(q,(void**)&e);
+	// queue_dequeue(q,(void*)temp);
+	// queue_dequeue(q,(void*)temp);
+	// queue_delete(q,(void*)30);
 
 	print_queue(q);
-	printf("\nfinal queue length: %d\n", queue_length(q));
+	// printf("final queue length: %d\n", queue_length(q));
 
 	return 0;
 }
