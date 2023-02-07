@@ -12,7 +12,7 @@ all: queue
 # 	ar rcs $@ $^
 
 queue: queue.c queue.h
-	gcc -Wall -Werror -Wextra -o $@ $<
+	gcc  -o $@ $< -g
 	
 # queue.o: queue.c queue.h
 # 	gcc -Wall -Werror -Wextra -o $@ $<

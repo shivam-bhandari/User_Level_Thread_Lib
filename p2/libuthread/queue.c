@@ -41,6 +41,15 @@ void print_queue(queue_t queue){
 		temp = temp->next;
 		i++;
 	}
+	i--;
+	temp = queue->rear;
+
+	while(temp!=NULL)
+	{
+		printf("Element %d is %p \n",i, temp->data);
+		temp = temp->prev;
+		i--;
+	}
 }
 
 int queueEmpty(queue_t queue){
@@ -50,11 +59,11 @@ int queueEmpty(queue_t queue){
 queue_t queue_create(void)
 {
 	/* TODO Phase 1 */
-	printf("in queue create:\n");
 	queue_t q = (queue_t)malloc(sizeof(struct queue));
     q->front = NULL;
 	q->rear = NULL;
 	q->len = 0;
+	printf("queue created\n\n");
     return q;
 }
 
@@ -75,10 +84,15 @@ queue_t queue_create(void)
 
 int queue_enqueue(queue_t queue, void *data)
 {
-	printf("in queue enqueue\n");
+	//printf("in queue enqueue\n");
 	/* TODO Phase 1 */
-	if ( !data || !queue) 
+
+
+	if ( !queue || !data) {
+		printf("queue or data empty\n");
 		return -1;
+	}
+
 
 	// create new node
 	struct Node* newNode = malloc(sizeof(struct Node));
@@ -89,30 +103,35 @@ int queue_enqueue(queue_t queue, void *data)
 		printf("malloc error\n");
 		return -1;
 	}
+	// printf("seg fault not here 2\n");
 	
 	// assign value 
 	newNode->data = data;
+	// printf("seg fault not here 3\n");
 	//printf("data: %p\n",newNode->data);
 
 	if (queueEmpty(queue)) {
-		queue->rear = newNode;
 		queue->front = newNode;
-		newNode->next = NULL;
-		newNode->prev = NULL;
+		queue->front->next = NULL;
+		queue->front->prev = NULL;
+		queue->rear = newNode;
+		// queue->rear->next = NULL;
+		// queue->rear->prev = NULL;
 	}
 	else {
-		// printf("else:\n");
+		struct Node* tmp = queue->rear;
 		queue->rear->next = newNode;
-		queue->rear->prev = queue->rear;
-		queue->rear = queue->rear->next;
+		queue->rear = newNode;
+
+		queue->rear->prev = tmp;
 		queue->rear->next = NULL;
 	} 
 
-	// printf("print front of queue\n");
+	printf("enqueue done\n\n");
 	// printf("front: %p\n", queue->front->data);
 	
-	//queue->len++;
-	print_queue(queue);
+	queue->len++;
+	//print_queue(queue);
 	return 0;
 }
 
@@ -120,60 +139,43 @@ int queue_enqueue(queue_t queue, void *data)
 
 int queue_dequeue(queue_t queue, void **data)
 {
-	//printf("old queue len : %d\n",queue_length(queue));
-	printf("in queue dequeue\n");
+	//printf("in queue dequeue\n");
 	if(queueEmpty(queue) || !queue || data == NULL) 
 	{
 		printf("queue or data NULL; return -1\n");
 		return -1;
 	}
+	if(queue->front == NULL) {
 
-	*data = queue->front->data;
+		printf("aaa\n");
+	}
 
-	// if(!queueEmpty(queue)) {  
-	//	 *data = queue->front->data;
-
-	// 	//printf("queue not empty\n");
-
-	// 	struct Node* tmp = queue->front;
-	// 	// case 1: front and rear of q are not the same nodes
-	// 	if(queue->len > 1) {
-
-	// 		//printf("quque len > 1\n");
-
-	// 		queue->front = queue->front->next;
-	// 		queue->front->prev = NULL;
-			
-	// 		// queue->front->next = tmp->next->next;
-			
-	// 	} else {
-
-	// 		//printf("queue len = 1\n");
-			
-	// 		queue->front = NULL;
-	// 		queue->rear = NULL;
-
-	// 	}
-	// 	// *data = tmp->data; // pointer allocation maybe
-	// 	free(tmp);
-
+	//printf("data at the front of queue is: %p\n", queue->front->data);
+	void** temp_data = queue->front->data;
+	data = temp_data;
+	//printf("data popped is: %p\n", (void**)data);
 
 	struct Node* temp = queue->front;
 
-	queue->front = queue->front->next;
-	
-	if(queue->front == NULL)
+	if(queue->len == 1) {
+		queue->front = NULL;
 		queue->rear = NULL;
-	else
-		queue->front->prev = NULL;
+		queue->len = 0;
 
+	} else {
+
+		queue->front = queue->front->next;
+		queue->front->prev = NULL;
+		temp->next = NULL;
+		queue->len--;
+	}
+	
 	free(temp);
-	// queue->len--;
 	
 	print_queue(queue);
 
-	printf("new queue len : %d\n", queue->len);
-
+	//printf("new queue len : %d\n", queue->len);
+	printf("deque done\n\n");
 	return 0;
 	/* TODO Phase 1 */
 }
@@ -181,7 +183,7 @@ int queue_dequeue(queue_t queue, void **data)
 int queue_delete(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
-	int flag = 0; // flag to check if data is found
+	int flag = 0, i = 1; // flag to check if data is found
 
 	if(!data || !queue)
 		return -1;
@@ -194,28 +196,47 @@ int queue_delete(queue_t queue, void *data)
 		flag = 1;
 		queue->rear = NULL;
 		queue->front = NULL;
+		queue->len--;
 		free(temp);
+		printf("deleted last element in queue\n");
+		// print_queue(queue);
 		return 0;
 	}
 
+	// printf("\ndata: %p\n", (void*)data);
+
 	while(temp!=NULL){
+		// printf("temp data: %p\n", temp->data);
 
 		if (temp->data == data)
 		{
+			
 			flag = 1;
-			struct Node *T = temp;
-			temp->prev->next = T->next;
-			temp->next->prev = T->prev;
-
-			free(T);
+			struct Node *P = temp->prev;
+			struct Node *N = temp->next;
+			if(i == 1) {
+				queue->front = N;
+				N->prev = NULL;
+			} 
+			else if(i == queue->len) {
+				queue->rear = P;
+				P->next = NULL;
+			} else {
+				N->prev = P;
+				P->next = N;
+			}
+			free(temp);
+			printf("delete completed\n\n");
 			break;
 		}
 		temp = temp->next;
+		i++;
 	}
 		
 	queue->len--;
-	if(flag == 0)
-		return flag;
+	// print_queue(queue);
+	if(flag == 1)
+		return 0;
 	return -1;
 	
 }
@@ -267,31 +288,17 @@ int main()
 	struct queue* q = queue_create();
 	int no = 1;
 	int *temp = &no;
-	//rintf("doing queue_enqueue:\n");
-	queue_enqueue(q, (void*)10);
-
-	// printf("doing second enqueque now\n");
-
-	queue_enqueue(q, (void*)20);
-	printf("queue length: %d\n", queue_length(q));
-
-	queue_dequeue(q, (void**)temp);
-	// // printf("queue length: %d\n", q->len);
-	// printf("\ntemp int dequed: %d\n\n", *temp);
-	// printf("Everything good till here \n");
-	// printf("queue length: %d\n", queue_length(q));
-
-	// printf("Done w second enqueue...\n");
-	// int* 
-	//printf("doing queue_front:\n");
-	
+	no = 30;
 	queue_enqueue(q, (void*)30);
-	printf("queue length: %d\n", queue_length(q));
-	print_queue(q);
-	// queue_dequeue(q, (void**)temp);
-	// queue_destroy()
-	
+	queue_enqueue(q, (void*)40);
+	queue_enqueue(q, (void*)50);
 
-	
+	queue_delete(q,(void*)40);
+	queue_delete(q,(void*)50);
+	queue_delete(q,(void*)30);
+
+	print_queue(q);
+	printf("\nfinal queue length: %d\n", queue_length(q));
+
 	return 0;
 }
