@@ -20,7 +20,6 @@ struct Node {
 };
 
 
-
 // The LL to store the queue
 // Using rear pointer to insert at the end 
 struct queue {
@@ -30,47 +29,26 @@ struct queue {
 	int len;
 };
 
+
 int queueEmpty(queue_t queue){
 	return queue->len == 0;
 }
 
-// int queue_pop(queue_t queue)
-// {
-// 	if (queueEmpty(queue)
-// 		|| queue == NULL) return -1;
-
-// 	struct Node *temp_rm;
-// 	temp_rm = queue->front;
-// 	queue->front = queue->front->next;
-	
-// 	if (queue->front) 
-// 		queue->front->prev = NULL;
-// 	// otherwise empty
-// 	else queue->rear = NULL;
-
-// 	queue->len--;
-// 	free(temp_rm);
-	
-// 	return 0;
-// }
-
-// void *queue_front(queue_t queue)
-// {
-// 	if (queueEmpty(queue)
-// 		|| queue == NULL) return NULL;
-// 	else return queue->front->data;
-// }
-
 void print_queue(queue_t queue){
-	if(!queue)
+	if(!queue) {
+		printf("no queue pointer\n");
 		return;
-	
+	}
+	if(queue->len == 0) {
+		printf("queue empty nothing to print\n");
+		return;
+	}
 	struct Node* temp;
 	int i = 1;
 	temp = queue->front;
 	while(temp!=NULL)
 	{
-		printf("Element %d is %p \n",i, temp->data);
+		printf("Element %d is %d \n",i, *(int*) temp->data);
 		temp = temp->next;
 		i++;
 	}
@@ -87,22 +65,23 @@ queue_t queue_create(void)
     return q;
 }
 
-// int queue_destroy(queue_t queue)
-// {
-// 	/* TODO Phase 1 */
-// 	// if (queue == NULL) return -1;
-// 	// while(!queueEmpty(queue)) {
-// 	// 	free(queue_front(queue));
-// 	// 	queue_pop(queue);
-// 	// }
-// 	// return 0;
-// }
+int queue_destroy(queue_t queue)
+{
+	if(!queue || queue->len > 0 ) {
+		
+		return -1;
+	} 
+	if(queue->len == 0) {
+		// free(queue->front);
+		free(queue);
+		queue = NULL;
+		printf("queue freed\n");
+	}
+	return 0;
+}
 
 int queue_enqueue(queue_t queue, void *data)
 {
-	//printf("in queue enqueue\n");
-	/* TODO Phase 1 */
-
 
 	if ( !queue || !data) {
 		printf("queue or data empty\n");
@@ -130,7 +109,7 @@ int queue_enqueue(queue_t queue, void *data)
 		queue->front = newNode;
 		queue->front->next = NULL;
 		queue->front->prev = NULL;
-		queue->rear = newNode;
+		queue->rear = queue->front;
 		// queue->rear->next = NULL;
 		// queue->rear->prev = NULL;
 	}
@@ -147,6 +126,10 @@ int queue_enqueue(queue_t queue, void *data)
 	// printf("front: %p\n", queue->front->data);
 	
 	queue->len++;
+	printf("enqueue: Element is %p \n", queue->rear->data);
+	// if(queue->rear->next == NULL) {
+	// 	printf("next is null\n");
+	// }
 	//print_queue(queue);
 	return 0;
 }
@@ -168,8 +151,8 @@ int queue_dequeue(queue_t queue, void **data)
 
 	//printf("data at the front of queue is: %p\n", queue->front->data);
 	void** temp_data = queue->front->data;
-	data = temp_data;
-	//printf("data popped is: %p\n", (void**)data);
+	*data = &temp_data;
+	// printf("data popped is: %p\n", (void**)data);
 
 	struct Node* temp = queue->front;
 
@@ -263,17 +246,16 @@ int queue_iterate(queue_t queue, queue_func_t func)
 	if(!queue || !func)
 		return -1;
 	
-	// // iterate through queue
+	// iterate through queue
 
 	struct Node* temp;
 	temp = queue->front;
-	struct Node* tempt = NULL;
+	struct Node* temp1 = NULL;
 	while(temp!=NULL){
-		tempt = temp->next;
-
+		temp1 = temp->next;
 		func(queue, temp->data);
-		temp = NULL;
-		temp = tempt;
+		// temp = NULL;
+		temp = temp1;
 	}
 
 	return 0;
@@ -296,28 +278,40 @@ int queue_length(queue_t queue)
 }
 
 // function to print queue
- 
+static void iterator_inc(queue_t q, void *data)
+{
+    int *a = (int*)data;
+
+    if (*a == 42)
+        queue_delete(q, data);
+    else
+        *a += 1;
+}
 
 int main()
 {
 	//printf("doing queue_create:\n");
 	struct queue* q = queue_create();
+	int no = 1;
+	int *temp = &no;
+	int a = 30, b = 42, c = 50;
+	queue_enqueue(q, (void*)&a);
+	queue_enqueue(q, (void*)&b);
+	queue_enqueue(q, (void*)&c);
 
-	queue_enqueue(q, (void*)30);
-	queue_enqueue(q, (void*)40);
-	queue_enqueue(q, (void*)50);
+	// int x = 30;
+	// int *p = &x;
+	// int **p2 = &p;
+
+	// queue_dequeue(queue, p2);
+	// print(**p2);
+	// queue_dequeue(q, (void**)&temp);
 	// int* e;
-	queue_delete(q,(void*)40);
-	// print_queue(q);
 	// queue_destroy(q);
-	// queue_dequeue(q,(void**)&e);
-	// queue_dequeue(q,(void**)&e);
-	// queue_dequeue(q,(void**)&e);
-	// queue_dequeue(q,(void*)temp);
-	// queue_dequeue(q,(void*)temp);
-	// queue_delete(q,(void*)30);
-
+	// queue_delete(q,(void*)40);
+	queue_iterate(q, iterator_inc);
 	print_queue(q);
+	
 	// printf("final queue length: %d\n", queue_length(q));
 
 	return 0;
