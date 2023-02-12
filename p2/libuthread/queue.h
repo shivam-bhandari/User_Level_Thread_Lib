@@ -22,6 +22,7 @@ typedef struct queue* queue_t;
  */
 queue_t queue_create(void);
 
+
 /*
  * queue_destroy - Deallocate a queue
  * @queue: Queue to deallocate
