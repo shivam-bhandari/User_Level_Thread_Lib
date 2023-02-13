@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "private.h": "c",
+        "queue.h": "c"
+    }
+}

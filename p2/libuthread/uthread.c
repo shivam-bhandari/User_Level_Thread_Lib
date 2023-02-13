@@ -36,27 +36,17 @@ void uthread_yield(void)
 	// save current thread and make it ready if its running
 	struct uthread_tcb* cur_save = uthread_current();
 
-	// if the current state is running, then it hasnt
-	// finished its execution, so its we reset its 
-	// state to ready.
 	if (cur_save->state == RUNNING)
 		cur_save->state = READY;
 
-
-	// get the oldest element from the thread and make sure it is ready
-	// save oldest element in the queue
 	struct uthread_tcb *front;
 
 	queue_dequeue(queue, (void**) &front);
-	// the oldest element in the queue is now ready 
-	// to be next thread in context execution but it
-	// had to have come from a ready state since it was queued
 	assert(front->state == READY);
 
 	// make it running now
 	front->state = RUNNING;
 
-	// current thread becomes the new thread from queue
 	// now the current thread is the new thread from the queue
 	currentThread = front;
 
@@ -67,8 +57,6 @@ void uthread_yield(void)
 		queue_enqueue(queue, cur_save);
 	}
 	
-	// switch context from the previous one 
-	// to the new one from the dequeue
 	uthread_ctx_switch(cur_save->context, front->context);
 	if (cur_save->state == EXITED) {
 		free(cur_save->context);
@@ -129,6 +117,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	while(queue_length(queue) != 0) 
 		uthread_yield();
 
+	queue_destroy(queue);
 	return 0;
 }
 

@@ -5,21 +5,21 @@ CC := gcc
 
 # all: $(lib) queue project2
 
-all:  libuthread.a 
+all:  libuthread.a uthread.o
 
 # project2: $(lib)
 # 	gcc -o $@ $< -lm
 
 # $(lib): queue.o
 # 	ar rcs $@ $^
-libuthread.a: queue.o 
+libuthread.a: queue.o uthread.o
 	ar rcs $@ $^ 
 
 # hello: uthread.o
 # 	$(CC) -o $@ $^ -g
 
-# uthread.o: uthread.c uthread.h private.h context.c queue.h 
-# 	$(CC)  -c -r -g $<
+uthread.o: uthread.c uthread.h private.h context.c queue.h 
+	$(CC)  -c -r -g $<
 
 
 # queue: queue.o
@@ -29,4 +29,4 @@ queue.o: queue.c queue.h
 	$(CC) -c $(CFLAGS)  -r -g $<
 
 clean: 
-	rm -f %.o $(lib) queue  
+	rm -f *.o $(lib) queue  
