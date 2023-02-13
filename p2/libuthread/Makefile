@@ -12,14 +12,14 @@ all:  libuthread.a
 
 # $(lib): queue.o
 # 	ar rcs $@ $^
-libuthread.a: queue.o uthread.o
+libuthread.a: queue.o 
 	ar rcs $@ $^ 
 
 # hello: uthread.o
 # 	$(CC) -o $@ $^ -g
 
-uthread.o: uthread.c uthread.h private.h context.c queue.h 
-	$(CC)  -c -r -g $<
+# uthread.o: uthread.c uthread.h private.h context.c queue.h 
+# 	$(CC)  -c -r -g $<
 
 
 # queue: queue.o

@@ -35,6 +35,8 @@ void test_queue_simple(void)
 	queue_enqueue(q, &data);
 	queue_dequeue(q, (void**)&ptr);
 	TEST_ASSERT(ptr == &data);
+
+	queue.destroy(q);
 }
 
 int main(void)
