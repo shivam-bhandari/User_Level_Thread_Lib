@@ -48,7 +48,6 @@ void uthread_yield(void)
 	struct uthread_tcb *front;
 
 	queue_dequeue(queue, (void**) &front);
-	// preempt_enable();
 	// the oldest element in the queue is now ready 
 	// to be next thread in context execution but it
 	// had to have come from a ready state since it was queued
@@ -65,18 +64,12 @@ void uthread_yield(void)
 	// enqueue the old one to the back of the queue
 	if (cur_save->state == READY)
 	{		
-		// Disable Preemption
-		// if(!(preempt_disabled())){
-		// 	preempt_disable();
-		// }	
 		queue_enqueue(queue, cur_save);
-		// preempt_enable();
 	}
 	
 	// switch context from the previous one 
 	// to the new one from the dequeue
 	uthread_ctx_switch(cur_save->context, front->context);
-	// preempt_enable();
 	if (cur_save->state == EXITED) {
 		free(cur_save->context);
 		free(cur_save->stack);
