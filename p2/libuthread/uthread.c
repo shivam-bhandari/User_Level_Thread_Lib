@@ -8,7 +8,7 @@
 
 #include "private.h"
 #include "uthread.h"
-#include "queue.c"
+#include "queue.h"
 
 typedef enum {RUNNING,READY,EXITED,BLOCKED}uthread_state;
 queue_t queue;
@@ -47,7 +47,7 @@ void uthread_yield(void)
 	// save oldest element in the queue
 	struct uthread_tcb *front;
 
-	queue_dequeue(queue, (void**) &front)
+	queue_dequeue(queue, (void**) &front);
 	// preempt_enable();
 	// the oldest element in the queue is now ready 
 	// to be next thread in context execution but it
@@ -59,7 +59,7 @@ void uthread_yield(void)
 
 	// current thread becomes the new thread from queue
 	// now the current thread is the new thread from the queue
-	curThread = front;
+	currentThread = front;
 
 	// push the old thread to back of the queue if it is ready
 	// enqueue the old one to the back of the queue
@@ -92,7 +92,7 @@ void uthread_exit(void)
 
 	free(cur_running->context);
 	free(cur_running->stack);
-	cur_running->state = TERMINATED;
+	cur_running->state = EXITED;
 
 	// goto next thread in queue
 	uthread_yield();
@@ -105,7 +105,7 @@ int uthread_create(uthread_func_t func, void *arg)
 
 	// initialize thread properties
 	thread->context = (uthread_ctx_t *)malloc(sizeof(uthread_ctx_t));
-	thread->state   = ready;
+	thread->state   = READY;
 	thread->id 		= thread_id++;
 	thread->stack   = uthread_ctx_alloc_stack();
 
@@ -123,7 +123,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 
 	// initialize thread properties
 	idle_thread->context = (uthread_ctx_t *)malloc(sizeof(uthread_ctx_t));
-	idle_thread->state   = running;
+	idle_thread->state   = RUNNING;
 	idle_thread->id      = thread_id;
 	thread_id++;
 

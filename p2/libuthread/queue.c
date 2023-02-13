@@ -277,7 +277,7 @@ int queue_length(queue_t queue)
 	return length;
 }
 
-// function to print queue
+/* tester function
 static void iterator_inc(queue_t q, void *data)
 {
     int *a = (int*)data;
@@ -287,13 +287,15 @@ static void iterator_inc(queue_t q, void *data)
     else
         *a += 1;
 }
+*/
 
+/*
 int main()
 {
 	//printf("doing queue_create:\n");
 	struct queue* q = queue_create();
-	int no = 1;
-	int *temp = &no;
+	// int no = 1;
+	// int *temp = &no;
 	int a = 30, b = 42, c = 50;
 	queue_enqueue(q, (void*)&a);
 	queue_enqueue(q, (void*)&b);
@@ -316,3 +318,4 @@ int main()
 
 	return 0;
 }
+*/
