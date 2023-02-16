@@ -35,24 +35,20 @@ int queueEmpty(queue_t queue){
 }
 
 void print_queue(queue_t queue){
-	if(!queue) {
-		// printf("no queue pointer\n");
-		return;
-	}
-	if(queue->len == 0) {
-		// printf("queue empty nothing to print\n");
-		return;
-	}
+	// if(!queue)
+	// 	break;
+	
 	struct Node* temp;
 	int i = 1;
 	temp = queue->front;
 	while(temp!=NULL)
 	{
-		// printf("Element %d is %d \n",i, *(int*) temp->data);
+		printf("Element %d is %d \n",i, *(int*)temp->data);
 		temp = temp->next;
 		i++;
 	}
-
+	
+	printf("\n");
 }
 queue_t queue_create(void)
 {
@@ -109,7 +105,7 @@ int queue_enqueue(queue_t queue, void *data)
 		queue->front = newNode;
 		queue->front->next = NULL;
 		queue->front->prev = NULL;
-		queue->rear = queue->front;
+		queue->rear = newNode;
 		// queue->rear->next = NULL;
 		// queue->rear->prev = NULL;
 	}
@@ -124,13 +120,9 @@ int queue_enqueue(queue_t queue, void *data)
 
 	// printf("enqueue done\n\n");
 	// printf("front: %p\n", queue->front->data);
-	
+
 	queue->len++;
-	// printf("enqueue: Element is %p \n", queue->rear->data);
-	// if(queue->rear->next == NULL) {
-	// 	printf("next is null\n");
-	// }
-	print_queue(queue);
+	// print_queue(queue);
 	return 0;
 }
 
@@ -184,12 +176,16 @@ int queue_delete(queue_t queue, void *data)
 	/* TODO Phase 1 */
 	int flag = 0, i = 1; // flag to check if data is found
 
-	if(!data || !queue)
+	if(!data || !queue )
 		return -1;
+	if(queue_length(queue) == 0) {
+		return -1;
+	}
 
 	struct Node* temp = queue->front;
 
 	// if queue has only one element
+	// print_queue(queue);
 
 	if((temp->next == NULL) && (temp->data == data)){
 		flag = 1;
@@ -205,11 +201,11 @@ int queue_delete(queue_t queue, void *data)
 	// printf("\ndata: %p\n", (void*)data);
 
 	while(temp!=NULL){
-		// printf("temp data: %p\n", temp->data);
+		// printf("temp data: %d\n", *(int*)temp->data);
 
 		if (temp->data == data)
 		{
-			
+			// printf("enters this\n");
 			flag = 1;
 			struct Node *P = temp->prev;
 			struct Node *N = temp->next;
@@ -226,16 +222,18 @@ int queue_delete(queue_t queue, void *data)
 			}
 			free(temp);
 			// printf("delete completed\n\n");
+			queue->len--;
 			break;
 		}
 		temp = temp->next;
 		i++;
 	}
-		
-	queue->len--;
+	// printf("flag: %d\n", flag);	
 	// print_queue(queue);
-	if(flag == 1)
+	if(flag == 1){
+
 		return 0;
+	}
 	return -1;
 	
 }
@@ -292,13 +290,17 @@ static void iterator_inc(queue_t q, void *data)
 
 // int main()
 // {
-// 	//printf("doing queue_create:\n");
-// 	int data = 3, *ptr;
+// 	int data1 = 3, data2 = 4, data3 = 5;
+// 	// int *ptr = &data;
 // 	queue_t q;
+// 	printf("doing enqueue:\n");
 // 	q = queue_create();
-// 	queue_enqueue(q, &data);
-// 	queue_dequeue(q, (void**)&ptr);
-// 	printf("data out: %d\n", *ptr);
+
+// 	queue_enqueue(q, &data1);
+// 	// data = 4;
+// 	queue_enqueue(q, &data2);
+// 	// data = 5;
+// 	queue_enqueue(q, &data3);
 
 // 	return 0;
 // }

@@ -35,16 +35,15 @@ void uthread_yield(void)
 	/* TODO Phase 2 */
 	// save current thread and make it ready if its running
 	struct uthread_tcb* cur_save = uthread_current();
-
+	// cursave is idle initially
 	if (cur_save->state == RUNNING)
 		cur_save->state = READY;
 
 	struct uthread_tcb *front;
 
 	queue_dequeue(queue, (void**) &front);
-	assert(front->state == READY);
 
-	// make it running now
+	// make it running now i.e thread 2 is now running
 	front->state = RUNNING;
 
 	// now the current thread is the new thread from the queue
@@ -52,12 +51,15 @@ void uthread_yield(void)
 
 	// push the old thread to back of the queue if it is ready
 	// enqueue the old one to the back of the queue
+	// make cursave ready and put into the queue at the end
 	if (cur_save->state == READY)
 	{		
 		queue_enqueue(queue, cur_save);
 	}
-	
+
+	// switch process to front ie thread 2
 	uthread_ctx_switch(cur_save->context, front->context);
+
 	if (cur_save->state == EXITED) {
 		free(cur_save->context);
 		free(cur_save->stack);
