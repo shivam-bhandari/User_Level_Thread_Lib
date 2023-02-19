@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "queue.h"
 #include "sem.h"
@@ -27,7 +28,7 @@ int sem_destroy(sem_t sem)
 	/* TODO Phase 3 */
 	if (!sem) return -1;
 	
-	if (queue_destroy(sem->wait_list) == -1) return -1;
+	if (queue_destroy(sem->blocked_list) == -1) return -1;
 	preempt_enable();
 	free(sem);
 	return 0;
@@ -36,10 +37,34 @@ int sem_destroy(sem_t sem)
 int sem_down(sem_t sem)
 {
 	/* TODO Phase 3 */
+	if (!sem) return -1;
+
+	if (sem->semaphore_count == 0) {
+		struct uthread_tcb *cur_tcb = uthread_current();
+		queue_enqueue(sem->blocked_list, cur_tcb);
+		uthread_block();
+	} 
+
+	else sem->semaphore_count--;
+	return 0;
 }
 
 int sem_up(sem_t sem)
 {
 	/* TODO Phase 3 */
+	if (!sem) return -1;
+
+
+	if (queue_length(sem->blocked_list) != 0) {
+		struct uthread_tcb *front;
+		if (queue_dequeue(sem->blocked_list, (void**) &front) == -1) {
+			printf("Failure to dequeue from queue.\n");
+			return -1;
+		}
+		uthread_unblock(front);
+	}
+
+	else sem->semaphore_count++;
+	return 0;
 }
 

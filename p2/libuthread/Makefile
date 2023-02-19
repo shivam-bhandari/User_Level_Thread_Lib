@@ -12,7 +12,7 @@ all:  $(lib)
 
 # $(lib): queue.o
 # 	ar rcs $@ $^
-$(lib): queue.o context.o uthread.o preempt.o
+$(lib): queue.o context.o uthread.o preempt.o sem.o
 	ar rcs $@ $^ 
 
 # hello: uthread.o

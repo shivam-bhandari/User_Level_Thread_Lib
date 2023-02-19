@@ -126,10 +126,20 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void)
 {
 	/* TODO Phase 3 */
+	currentThread->state = BLOCKED;
+	uthread_yield();
 }
 
 void uthread_unblock(struct uthread_tcb *uthread)
 {
 	/* TODO Phase 3 */
+	// check if blocked
+	assert(uthread->state == BLOCKED);
+
+	// find the thread in the queue and change state
+	uthread->state = READY;
+	
+	// enqueue back into the queue 
+	queue_enqueue(queue, uthread);
 }
 
