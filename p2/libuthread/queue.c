@@ -126,7 +126,7 @@ int queue_enqueue(queue_t queue, void *data)
 	return 0;
 }
 
-// @TRISHNA IMPLEMENT THIS
+
 
 int queue_dequeue(queue_t queue, void **data)
 {
@@ -245,14 +245,13 @@ int queue_iterate(queue_t queue, queue_func_t func)
 		return -1;
 	
 	// iterate through queue
-
+	// keeping temp1 since we dont want to lose the pointer if delete is called on an element
 	struct Node* temp;
 	temp = queue->front;
 	struct Node* temp1 = NULL;
 	while(temp!=NULL){
 		temp1 = temp->next;
 		func(queue, temp->data);
-		// temp = NULL;
 		temp = temp1;
 	}
 
