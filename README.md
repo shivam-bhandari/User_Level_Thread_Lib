@@ -45,7 +45,7 @@ the sem. sem_up involved increasing the count and providing resources to blocked
 sem_down put threads to wait in the blocked list and decremented resources. 
 ## PHASE 4: preempt.c
 We set up a signal handler `signal_handler()` to yield to the next thread. To 
-set the signal 
+set the signal we reset the flags and mask, set the `SIGVTALRM`, and 
 
 ### tester function: test_preempt.c
 We use test_preempt.c to test our preemption.

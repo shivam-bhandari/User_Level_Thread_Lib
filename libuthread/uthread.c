@@ -16,6 +16,7 @@
 // enum to store info about state
 typedef enum {RUNNING,READY,EXITED,BLOCKED} uthread_state; 
 queue_t queue;
+queue_t dead_queue;
 
 struct uthread_tcb {
 	uthread_ctx_t *context;
@@ -81,10 +82,11 @@ void uthread_exit(void)
 	struct uthread_tcb *cur_running = uthread_current();
 
 	// frees the current thread's contexts and stack and changes the state to exited
-	free(cur_running->context);
-	free(cur_running->stack);		
+	// free(cur_running->context);
+	// free(cur_running->stack);		
 	cur_running->state = EXITED;
-
+	// push into exited queue
+	queue_enqueue(dead_queue, cur_running);
 	// goto next thread in queue
 	uthread_yield();
 }
@@ -139,7 +141,22 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 
 	// Complete all threads before returning to main thread
 	while(queue_length(queue) != 0) 
+	{
 		uthread_yield();
+
+		preempt_disable();
+		if(queue_length(dead_queue) > 0)
+		{
+			struct uthread_tcb *dead_thread;
+			while(queue_length(dead_queue) != 0) 
+			{
+				queue_dequeue(dead_queue, (void**)&dead_thread);
+				free(dead_thread->context);
+				free(dead_thread->stack);
+			}
+		}
+		preempt_enable();
+	}
 
 	preempt_disable();
 	/*
@@ -154,7 +171,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 
 void uthread_block(void)
 {
+	preempt_disable();
 	currentThread->state = BLOCKED;   // block the current thread and yield to the rest
+	preempt_enable();
 	uthread_yield();
 }
 
@@ -167,7 +186,9 @@ void uthread_unblock(struct uthread_tcb *uthread)
 		return;
 	}
 	// Change state to ready and put it in the queue for running
+	preempt_disable();
 	uthread->state = READY;
+	preempt_enable();
 	
 	// enqueue back into the queue 
 	preempt_disable();
