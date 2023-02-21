@@ -5,18 +5,15 @@
 void thread2(void* arg)
 {
     (void)arg;
-	printf("Entered thread 2\n");
+	printf("Thread 2\n");
 	exit(0);
 }
 
 void thread1(void* arg)
 {
     (void)arg;
-    printf("Entered thread 1\n");
+    printf("Thread 1\n");
 	uthread_create(thread2,arg);
-
-	// The only way for thread 2 to be entered is if an interrupt
-	// causes it to switch from thread1 to thread2.
 	while (1) {}
 }
 

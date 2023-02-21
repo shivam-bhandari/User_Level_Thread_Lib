@@ -13,23 +13,24 @@
 // use of preemption before all queue processes, since we don't want queue resources 
 // manipulated by multiple threads
 
-// enum to store info about state
-typedef enum {RUNNING,READY,EXITED,BLOCKED} uthread_state; 
+typedef enum {RUNNING, READY, EXITED, BLOCKED} uthread_state; // state information
 queue_t queue;
 queue_t dead_queue;
 
-struct uthread_tcb {
+// we store the context, stack and state
+struct uthread_tcb 
+{
 	uthread_ctx_t *context;
 	void* stack;
 	uthread_state state;
 };
 
 // stores information about our current thread
-struct uthread_tcb* currentThread; 
+struct uthread_tcb* current_thread; 
 
 struct uthread_tcb *uthread_current(void)
 {
-	return currentThread;
+	return current_thread;
 }
 
 void uthread_yield(void)
@@ -52,13 +53,9 @@ void uthread_yield(void)
 	next_thread->state = RUNNING;
 
 	// now the current thread is the new thread from the queue
-	currentThread = next_thread;
+	current_thread = next_thread;
 
-	// push the old thread to back of the queue
-	// enqueue the old one to the back of the queue
-	// make cursave ready and put into the queue at the end
-
-	// check if ready since it can be interrupted
+	// below function makes cursave ready and push into the queue at the end
 	if (cur_save->state == READY)
 	{
 		preempt_disable();		
@@ -69,21 +66,13 @@ void uthread_yield(void)
 	// switch process to next_thread ie thread 2
 	uthread_ctx_switch(cur_save->context, next_thread->context);
 
-	// if (cur_save->state == EXITED) {
-	// 	free(cur_save->context);
-	// 	free(cur_save->stack);
-	// 	free(cur_save);
-	// 	cur_save = NULL;
-	// }
 }
 
 void uthread_exit(void)
 {
 	struct uthread_tcb *cur_running = uthread_current();
 
-	// frees the current thread's contexts and stack and changes the state to exited
-	// free(cur_running->context);
-	// free(cur_running->stack);		
+	// frees the current thread's contexts and stack and changes the state to exited	
 	cur_running->state = EXITED;
 	// push into exited queue
 	queue_enqueue(dead_queue, cur_running);
@@ -134,7 +123,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	idle_thread->context = (uthread_ctx_t *)malloc(sizeof(uthread_ctx_t));
 	idle_thread->state   = RUNNING;
 	preempt_enable();
-	currentThread = idle_thread;
+	current_thread = idle_thread;
 
 	// Initiallizes a new thread with func
 	uthread_create(func, arg);
@@ -172,7 +161,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void)
 {
 	preempt_disable();
-	currentThread->state = BLOCKED;   // block the current thread and yield to the rest
+	current_thread->state = BLOCKED;   // block the current thread and yield to the rest
 	preempt_enable();
 	uthread_yield();
 }
