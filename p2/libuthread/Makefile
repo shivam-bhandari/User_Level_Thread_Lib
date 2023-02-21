@@ -19,7 +19,7 @@ $(lib): queue.o context.o uthread.o preempt.o sem.o
 # 	$(CC) -o $@ $^ -g
 
 %.o: %.c 
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # context.o: context.c private.h
 # 	$(CC) -c context.c -o context.o

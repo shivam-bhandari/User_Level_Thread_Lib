@@ -144,7 +144,7 @@ void null_dequeue() {
 
 	queue_t q = NULL;
 	int  *ptr;
-	TEST_ASSERT(queue_enqueue(q, (void**)&ptr) == -1);
+	TEST_ASSERT(queue_dequeue(q, (void**)&ptr) == -1);
 
 	queue_destroy(q);
 }
@@ -159,19 +159,18 @@ void null_delete() {
 	queue_destroy(q);
 }
 
-/* tries to create queue when queue is not empty*/
-void enqueue_create() {
-	int data = 10;
-	queue_t q;
-	q = queue_create();
+/* test to check if program returns -1 if NULL data is passed as second argument to the enqueue, dequeue and delete functions*/
+void data_null() {
+	queue_t q = queue_create();
 
-	fprintf(stderr, "\n*** TEST 3create queue after enqueing  ***\n");
+	fprintf(stderr, "\n*** TEST enqueue NULL to the queue ***\n");
+	TEST_ASSERT(queue_enqueue(q, NULL) == -1);
 
-	queue_enqueue(q, &data);
-	data = 20;
-	queue_enqueue(q, &data);
+	fprintf(stderr, "\n*** TEST dequeue NULL to the queue ***\n");
+	TEST_ASSERT(queue_dequeue(q, NULL) == -1);
 
-	TEST_ASSERT(queue_create() == NULL);
+	fprintf(stderr, "\n*** TEST delete NULL to the queue ***\n");
+	TEST_ASSERT(queue_delete(q, NULL) == -1);
 
 	queue_destroy(q);
 }
@@ -196,6 +195,8 @@ int main(void)
 	null_enqueue();
 	null_dequeue();
 	null_delete();
+
+	data_null();
 
 	// fix this: 
 	// enqueue_create();
