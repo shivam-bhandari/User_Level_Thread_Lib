@@ -147,7 +147,7 @@ int queue_dequeue(queue_t queue, void **data)
 		queue->len = 0;
 
 	} else {
-		queue->front = queue->front->next; // front of the queue points to the lement that comes right after it
+		queue->front = queue->front->next; // front of the queue points to the element that comes right after it
 		queue->front->prev = NULL;
 		temp->next = NULL; // delinks the front of the queue as a stand alone node
 		queue->len--; // decrements size of queue
@@ -231,16 +231,16 @@ int queue_iterate(queue_t queue, queue_func_t func)
 {
 	if(!queue || !func)
 		return -1;
-	
-	// iterate through queue
-	// keeping temp1 since we dont want to lose the pointer if delete is called on an element
+
+	/* keep an extra temporary pointer temp1 so as to not lose the pointer if a node is deleted*/
 	struct Node* temp;
 	temp = queue->front;
-	// struct Node* temp1 = NULL;
+	struct Node* temp1 = NULL;
+
 	while(temp != NULL){
-		// temp1 = temp->next;
+		temp1 = temp->next;
 		func(queue, temp->data);
-		temp = temp->next;
+		temp = temp1;
 	}
 	return 0;
 }

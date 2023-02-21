@@ -17,10 +17,13 @@
 #define HZ 100
 
 int preempt_flag = 1;
+
 // setting up signal
 struct sigaction new_act, old_act;
+
 // setting up timer
 struct itimerval new_tim, old_tim;
+
 // used to store the blocked and old signals
 sigset_t block; 
 sigset_t old_set; 
@@ -28,7 +31,6 @@ sigset_t old_set;
 void signal_handler(int signum)
 {
 	(void)signum;
-	// printf("Beep Beep\n");
 	uthread_yield();
 }
 
@@ -63,15 +65,14 @@ void preempt_start(bool preempt)
 	sigemptyset(&new_act.sa_mask);
 	new_act.sa_flags = 0;
 	sigaddset(&new_act.sa_mask, SIGVTALRM);
-	sigprocmask(SIGVTALRM, NULL, &old_set);
-	new_act.sa_handler = (__sighandler_t)signal_handler;
+	sigprocmask(SIG_SETMASK, NULL, &old_set);
+	new_act.sa_handler = signal_handler;
 	sigaction(SIGVTALRM, &new_act, &old_act);
 
 	new_tim.it_interval.tv_sec = 0;
-	new_tim.it_interval.tv_usec = 10000;
+	new_tim.it_interval.tv_usec = 1000000/HZ;
 	new_tim.it_value.tv_sec = 0;
-	new_tim.it_value.tv_usec = 10000;
-
+	new_tim.it_value.tv_usec = 1000000/HZ;
 	setitimer(ITIMER_VIRTUAL, &new_tim, &old_tim);
 
 }
@@ -87,7 +88,3 @@ void preempt_stop(void)
 		perror(":sigaction error:");
 	}
 }
-
-// save old one
-// empty the new one
-// sigaddset
