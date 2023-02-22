@@ -86,5 +86,5 @@ void preempt_stop(void)
 	/* Resets the virtual timer, signal to its original state*/
 	setitimer(ITIMER_VIRTUAL, &old_tim, NULL);
 	sigprocmask(SIG_SETMASK, &old_set, NULL);
-	sigaction(SIGVTALRM, &old_act, NULL) < 0;
+	sigaction(SIGVTALRM, &old_act, NULL);
 }
