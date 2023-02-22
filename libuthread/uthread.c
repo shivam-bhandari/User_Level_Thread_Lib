@@ -119,6 +119,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		This is a critical section, and is protected by preemption to make sure queue_enqueue
 	*/
 	queue = queue_create();
+	dead_queue = queue_create();
 	preempt_enable();
 
 	struct uthread_tcb *idle_thread = (struct uthread_tcb *)malloc(sizeof(struct uthread_tcb));
@@ -141,22 +142,30 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		preempt_disable();
 		if (queue_length(dead_queue) > 0)
 		{
-			struct uthread_tcb *dead_thread;
+			/* freeing the memory for the thread */
 			while (queue_length(dead_queue) != 0)
 			{
+				struct uthread_tcb *dead_thread;
 				queue_dequeue(dead_queue, (void **)&dead_thread);
 				free(dead_thread->context);
 				free(dead_thread->stack);
+				free(dead_thread);
+				
 			}
 		}
 		preempt_enable();
 	}
+
+	/* freeing the context and tcb memory allocated in this function */
+	free(idle_thread->context);
+	free(idle_thread);
 
 	preempt_disable();
 	/*
 		This is a critical section, and is protected by preemption to make sure queue_enqueue
 	*/
 	queue_destroy(queue);
+	queue_destroy(dead_queue);
 	preempt_enable();
 
 	preempt_stop(); // stop preemption
