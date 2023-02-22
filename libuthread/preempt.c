@@ -26,8 +26,8 @@ struct sigaction new_act, old_act;
 struct itimerval new_tim, old_tim;
 
 // used to store the blocked and old signals
-sigset_t block; 
-sigset_t old_set; 
+sigset_t block;
+sigset_t old_set;
 
 void signal_handler(int signum)
 {
@@ -38,7 +38,8 @@ void signal_handler(int signum)
 // blocks preemption
 void preempt_disable(void)
 {
-	if (preempt_flag == 0){
+	if (preempt_flag == 0)
+	{
 		return;
 	}
 	sigprocmask(SIG_BLOCK, &block, NULL);
@@ -47,7 +48,8 @@ void preempt_disable(void)
 // unblocks preemption
 void preempt_enable(void)
 {
-	if (preempt_flag == 0){
+	if (preempt_flag == 0)
+	{
 		return;
 	}
 	sigprocmask(SIG_UNBLOCK, &block, NULL);
@@ -56,11 +58,12 @@ void preempt_enable(void)
 /* Refered to resources listed in the ReadMe to set up signal handler */
 void preempt_start(bool preempt)
 {
-	if (preempt == false){
+	if (preempt == false)
+	{
 		preempt_flag = 0;
 		return;
 	}
-	
+
 	/* Signal handler set up; reset the flags and mask; and set the SIGVTALRM; sigprocmask used to save the old set signals */
 	sigemptyset(&new_act.sa_mask);
 	new_act.sa_flags = 0;
@@ -71,16 +74,16 @@ void preempt_start(bool preempt)
 
 	/* sets a virtual timer that waits for 10,000 seconds (1000000/HZ) */
 	new_tim.it_interval.tv_sec = 0;
-	new_tim.it_interval.tv_usec = 1000000/HZ;
+	new_tim.it_interval.tv_usec = 1000000 / HZ;
 	new_tim.it_value.tv_sec = 0;
-	new_tim.it_value.tv_usec = 1000000/HZ;
+	new_tim.it_value.tv_usec = 1000000 / HZ;
 	setitimer(ITIMER_VIRTUAL, &new_tim, &old_tim);
-
 }
 
 void preempt_stop(void)
 {
-	if (preempt_flag == 0){
+	if (preempt_flag == 0)
+	{
 		return;
 	}
 	/* Resets the virtual timer, signal to its original state*/
