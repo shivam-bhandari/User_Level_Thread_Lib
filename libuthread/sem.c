@@ -68,7 +68,11 @@ int sem_down(sem_t sem)
 		uthread_block(); // block the thread
 	}
 	else
+	{
+		preempt_disable();
 		sem->semaphore_count--;
+		preempt_enable();
+	}
 
 	return 0;
 }
@@ -92,7 +96,11 @@ int sem_up(sem_t sem)
 		uthread_unblock(front);
 	}
 	else
+	{
+		preempt_disable();
 		sem->semaphore_count++;
+		preempt_enable();
+	}
 
 	return 0;
 }
