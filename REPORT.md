@@ -1,4 +1,4 @@
-# ECS150P2
+# USER LEVEL THREAD LIBRARY
 
 ### PHASE 1: queue.c
 Phase 1 involved us building `queue.c` and `queue_tester_example.c`. For
